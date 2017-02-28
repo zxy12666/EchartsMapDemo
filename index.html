@@ -25,7 +25,8 @@
 <script type="text/javascript">
     // 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.getElementById('main'));
-
+    var markPoint=[];
+    var markPoint2=[];
     // 指定图表的配置项和数据
 
     var geoCoordMap = {
@@ -546,6 +547,7 @@
             {
                 id: 'bar2',
                 type: 'bar',
+                symbol: 'none',
                 itemStyle: {
                     normal: {
                         color: '#50576A'
@@ -553,8 +555,25 @@
                 },
                 silent: true,
                 barGap: '-100%', // Make series be overlap
-                data: [],
-                zlevel: 1
+                zlevel: 1,
+                markPoint:{
+                    //symbol:'image://img/starYellow.png',
+                    symbolSize:20,
+                    symbolOffset:['80%', '0%'],
+                    label:{
+                        normal:{
+                            show:false
+                        }
+                    },
+                    data: [
+                        {
+                            name: '任意屏幕位置',
+                            value: 111,
+                            x: 50, y: 100
+                        }
+                    ]
+                },
+                data: []
             },
             {
                 id: 'bar',
@@ -567,14 +586,14 @@
                     }
                 },
                 markPoint:{
-                    symbol:'image://img/starGray.png',
+                    //symbol:'image://img/starGray.png',
                     symbolSize:20,
+                    symbolOffset:['80%', '0%'],
                     label:{
                         normal:{
                             show:false
                         }
                     },
-                    symbolOffset:['80%', '0%'],
                     data : []
                 },
                 data: []
@@ -599,8 +618,41 @@
         });
     }, 0);*/
 function handleClick(params) {
+    markPoint=myChart.getOption().series[2].markPoint.data;
+    markPoint2=myChart.getOption().series[1].markPoint.data;
+    for(var i=0;i<markPoint.length;i++){
+        if(markPoint[i].yAxis==params.data.yAxis){
+            if(markPoint[i].symbol=='image://img/starGray.png'){
+                markPoint2.push(markPoint[i]);
+                markPoint[i].symbol='image://img/starYellow.png';
+            }else{
+                for(var j=0;j<markPoint.length;j++){
+                    if(markPoint[i].yAxis==params.data.yAxis){
+                        markPoint2.splice(j,1);
+                    }
+                }
+                markPoint[i].symbol='image://img/starGray.png';
+            }
+        }
+    };
+    var chartObject=new Object();
+    chartObject={
+        series: [{
+            id: 'bar',
+            markPoint:{
+                data:markPoint
+            }
+        },{
+            id: 'bar2',
+            markPoint:{
+                data:markPoint2
+            }
+        }]
+    };
+    myChart.setOption(chartObject);
     console.log(myChart.getOption());
-    console.log(params)
+    console.log(params);
+    console.log(this)
 }
     function renderBrushed(params) {
         console.log(params);
@@ -627,13 +679,12 @@ function handleClick(params) {
                 categoryData.push(selectedItems[i].name);
                 barData.push(selectedItems[i].value);
                 barData2.push(100);
-                if(i==0){
-                    markObject.symbol='star'
-                }
                 markObject.value=selectedItems[i].value;
                 markObject.xAxis=100;
                 markObject.yAxis=selectedItems[i].name;
+                markObject.symbol='image://img/starGray.png';
                 markPoint.push(markObject);
+
             }
         } else if(params.type=='datarangeselected'){
             var templeData=[];
@@ -647,6 +698,7 @@ function handleClick(params) {
                     markObject.value=data[j].value;
                     markObject.xAxis=100;
                     markObject.yAxis=data[j].name;
+                    markObject.symbol='image://img/starGray.png';
                     markPoint.push(markObject);
                 }
             }
@@ -686,7 +738,10 @@ function handleClick(params) {
                 }
             },{
                 id: 'bar2',
-                data: barData2
+                data: barData2,
+                markPoint:{
+                    data:markPoint2
+                }
             }]
         };
         if(params!=null){
