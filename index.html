@@ -182,7 +182,6 @@
         "邯郸":[114.47,36.6],
         "临安":[119.72,30.23],
         "兰州":[103.73,36.03],
-        "沧州":[116.83,38.33]
     };
 
     var data = [
@@ -338,8 +337,7 @@
         {name: "九江", value: 96},
         {name: "邯郸", value: 98},
         {name: "临安", value: 99},
-        {name: "兰州", value: 99},
-        {name: "沧州", value: 100},
+        {name: "兰州", value: 99}
     ];
 
     var convertData = function (data) {
@@ -365,11 +363,6 @@
 
 
     option = {
-        animation: true,
-        animationDuration: 1000,
-        animationEasing: 'cubicInOut',
-        animationDurationUpdate: 1000,
-        animationEasingUpdate: 'cubicInOut',
         title: [
 /*            {
                 text: '全国主要城市 PM 2.5',
@@ -382,15 +375,58 @@
             },*/
             {
                 id: 'statistic',
-                right: 200,
-                top: 40,
+                right: 170,
+                top: 100,
                 width: 100,
                 textStyle: {
                     color: '#fff',
                     fontSize: 16
                 }
+            },
+            {
+                id:'visualMap',
+                left: 125,
+                top: 100,
+                textStyle: {
+                    color: '#fff',
+                    fontSize: 14
+                }
             }
         ],
+        toolbox:{
+            show:false
+        },
+        visualMap: {
+            id:'visualMap',
+            type: 'continuous',
+            min: 0,
+            max: 100,
+            align:'bottom',
+            orient:'horizontal',
+            realtime: false,
+            calculable : true,
+            seriesIndex:[0],
+            left:20,
+            top:70,
+            target: {
+                inRange: {
+                    color: ['#fff']
+                }
+            },
+            controller: {
+                inRange: {
+                    color: ['#2193EC']
+                }
+            },
+            itemWidth:15,
+            itemHeight:200,
+            textStyle:{
+                color:'#fff'
+            },
+            formatter:function (value) {
+                return  value<10?"    "+value.toFixed(2)+"%":value<100?"  "+value.toFixed(2)+"%":value.toFixed(2)+"%"; // 范围标签显示内容。
+            }
+        },
         brush: {
             outOfBrush: {
                 color: '#abc'
@@ -412,13 +448,13 @@
             zoom: 1,
             label: {
                 emphasis: {
-                    show: false
+                    show: true
                 }
             },
             roam: false,
             itemStyle: {
                 normal: {
-                    areaColor: '#323c48',
+                    areaColor : '#07C0F8',
                     borderColor: '#111'
                 },
                 emphasis: {
@@ -427,20 +463,25 @@
             }
         },
         tooltip : {
-            trigger: 'item'
+            trigger: 'item',
+            formatter:function (params) {
+                if(params.componentSubType=="scatter"){
+                    return params.value!=null?params.name+":"+params.value+"<br />采集完整率："+params.value[2]+"%" :null;
+                }else if(params.componentSubType=="bar"){
+                    return params.value!=null?params.name+":"+params.value+"%":null;
+                }
+            }
         },
         grid: {
             right: 100,
-            top: 100,
+            top: 150,
             bottom: 40,
             width: '20%',
             height:'70%'
         },
         xAxis: {
             type: 'value',
-            scale: true,
             position: 'top',
-            boundaryGap: false,
             splitLine: {show: false},
             axisLine: {show: false},
             axisTick: {show: false},
@@ -459,28 +500,29 @@
                 type: 'slider',
                 show: true,
                 yAxisIndex: 0,
+                zoomLock:true,
                 filterMode: 'empty',
+                showDetail:false,
                 width: 20,
                 height: '70%',
-                handleSize: 30,
+                handleSize:0,
                 start: 85,
                 end: 100,
                 showDataShadow: false,
                 left: '95%',
                 textStyle:{
                     color:'#fff'
-                },
-                labelFormatter: function (value) {
+                }
+/*                labelFormatter: function (value) {
                     if(!isNaN(value)){
                         return data[value].value+'%';
                     }
 
-                }
+                }*/
             }
         ],
         series : [
             {
-                name: 'pm2.5',
                 type: 'scatter',
                 coordinateSystem: 'geo',
                 data: convertedData[0],
@@ -497,47 +539,43 @@
                 },
                 itemStyle: {
                     normal: {
-                        color: '#ddb926'
+                        color: '#fff'
                     }
                 }
             },
             {
-                name: 'Top 5',
-                type: 'effectScatter',
-                coordinateSystem: 'geo',
-                data: convertedData[1],
-                symbolSize: 10,
-                showEffectOn: 'emphasis',
-                rippleEffect: {
-                    brushType: 'stroke'
-                },
-                hoverAnimation: true,
-                label: {
-                    normal: {
-                        formatter: '{b}',
-                        position: 'right',
-                        show: true
-                    }
-                },
+                id: 'bar2',
+                type: 'bar',
                 itemStyle: {
                     normal: {
-                        color: '#f4e925',
-                        shadowBlur: 10,
-                        shadowColor: '#333'
+                        color: '#50576A'
                     }
                 },
+                silent: true,
+                barGap: '-100%', // Make series be overlap
+                data: [],
                 zlevel: 1
-
             },
             {
                 id: 'bar',
-                zlevel: 2,
+                zlevel: 99,
                 type: 'bar',
                 symbol: 'none',
                 itemStyle: {
                     normal: {
-                        color: '#ddb926'
+                        color: '#2193EC'
                     }
+                },
+                markPoint:{
+                    symbol:'image://img/starGray.png',
+                    symbolSize:20,
+                    label:{
+                        normal:{
+                            show:false
+                        }
+                    },
+                    symbolOffset:['80%', '0%'],
+                    data : []
                 },
                 data: []
             }
@@ -545,8 +583,8 @@
     };
 
 
-    myChart.on('brushselected', renderBrushed);
-    myChart.on('datazoom', renderBrushed);
+    myChart.on('datarangeselected', renderBrushed);
+    myChart.on('click', handleClick);
     // myChart.setOption(option);
 /*    setTimeout(function () {
         myChart.dispatchAction({
@@ -560,14 +598,22 @@
             ]
         });
     }, 0);*/
-
+function handleClick(params) {
+    console.log(myChart.getOption());
+    console.log(params)
+}
     function renderBrushed(params) {
+        console.log(params);
         var selectedItems = [];
         var categoryData = [];
         var barData = [];
+        var barData2 = [];
+        var markPoint=[];
         var sum = 0;
         var count = 0;
+        var chartObject=new Object();
 
+        if(params==null){
             for(var j=0;j<data.length;j++){
                 sum+=data[j].value;
             }
@@ -576,51 +622,101 @@
             selectedItems.sort(function (a, b) {
                 return a.value - b.value;
             });
-
             for (var i = 0; i < selectedItems.length; i++) {
+                var markObject=new Object;
                 categoryData.push(selectedItems[i].name);
                 barData.push(selectedItems[i].value);
+                barData2.push(100);
+                if(i==0){
+                    markObject.symbol='star'
+                }
+                markObject.value=selectedItems[i].value;
+                markObject.xAxis=100;
+                markObject.yAxis=selectedItems[i].name;
+                markPoint.push(markObject);
             }
-        /*else{
-            var mainSeries = params.batch[0].selected[0];
-            for (var i = 0; i < mainSeries.dataIndex.length; i++) {
-                var rawIndex = mainSeries.dataIndex[i];
-                var dataItem = convertedData[0][rawIndex];
-                var pmValue = dataItem.value[2];
-
-                sum += pmValue;
-                count++;
-
-                selectedItems.push(dataItem);
+        } else if(params.type=='datarangeselected'){
+            var templeData=[];
+            for(var j=0;j<data.length;j++){
+                if(data[j].value>=params.selected[0]&&data[j].value<=params.selected[1]){
+                    var templeObject=new Object();
+                    var markObject=new Object;
+                    templeObject.name=data[j].name;
+                    templeObject.value=data[j].value;
+                    templeData.push(templeObject);
+                    markObject.value=data[j].value;
+                    markObject.xAxis=100;
+                    markObject.yAxis=data[j].name;
+                    markPoint.push(markObject);
+                }
             }
-
-            selectedItems.sort(function (a, b) {
-                return a.value[2] - b.value[2];
+            count=templeData.length;
+            templeData.sort(function (a, b) {
+                return a.value - b.value;
             });
-
-            for (var i = 0; i < selectedItems.length; i++) {
-                categoryData.push(selectedItems[i].name);
-                barData.push(selectedItems[i].value[2]);
+            for (var i = 0; i < templeData.length; i++) {
+                categoryData.push(templeData[i].name);
+                barData.push(templeData[i].value);
+                barData2.push(100);
             }
+        }
 
-        }*/
-
-        myChart.setOption({
+        chartObject={
             yAxis: {
                 data: categoryData
             },
             xAxis: {
                 axisLabel: {show: !!count,formatter:'{value} %'}
             },
-            title: {
-                id: 'statistic',
-                text: '全国主要监测项目'
-            },
-            series: {
+            title: [
+                {
+                    id: 'statistic',
+                    text: '全国主要监测项目'
+                },
+                {
+                    id: 'visualMap',
+                    text: '数据采集完整率过滤'
+                }
+            ],
+            series: [{
                 id: 'bar',
-                data: barData
+                data: barData,
+                markPoint:{
+                    data:markPoint
+                }
+            },{
+                id: 'bar2',
+                data: barData2
+            }]
+        };
+        if(params!=null){
+            if(params.type=='datarangeselected'){
+                if(barData.length<=10){
+                    chartObject.dataZoom=[
+                        { // 第二个 dataZoom 组件
+                            start: 0,
+                            end: 100
+
+                        }
+                    ]
+                }else if(barData.length<=50){
+                    chartObject.dataZoom=[
+                        { // 第二个 dataZoom 组件
+                            start: 50,
+                            end: 100
+                        }
+                    ]
+                }else{
+                    chartObject.dataZoom=[
+                        { // 第二个 dataZoom 组件
+                            start: 85,
+                            end: 100
+                        }
+                    ]
+                }
             }
-        });
+        }
+        myChart.setOption(chartObject);
     }
 
     // 使用刚指定的配置项和数据显示图表。
