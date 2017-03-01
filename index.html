@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>ECharts</title>
-    <script src="//cdn.bootcss.com/jquery/3.1.1/jquery.js"></script>
+    <script src="js/jquery1.8.js"></script>
     <!-- 引入 echarts.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/3.4.0/echarts.min.js"></script>
     <script src="js/china.js"></script>
@@ -12,23 +12,39 @@
 
     <!-- 可选的 Bootstrap 主题文件（一般不用引入） -->
     <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
-
+    <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css">
     <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
     <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="js/bootstrap-datetimepicker.js"></script>
+    <script src="js/bootstrap-datetimepicker.zh-CN.js"></script>
 </head>
 <body>
 <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
 <div style="width:1400px;height: 900px;margin:0 auto;background-image: url(img/beijing.jpg);text-align: center" >
+    <div style="width: 500px;height: 100px;border:1px solid #FFFFFF;margin-bottom: -100px;display: inline-block;float: right">
+        <div style="width: 150px;height: 40px;background-color:#2c3343;border-radius:25px;">
+            <button style="background-image:url('img/return.png');background-color: #2c3343;background-repeat: no-repeat; width: 33px;height: 30px;border: 0px"></button>
+            <div class="input-append date form_datetime">
+                <input size="16" type="text" value="" readonly>
+                <span class="add-on"><i class="icon-th"></i></span>
+            </div>
+        </div>
+    </div>
     <div id="main"  style="width:1400px;height: 900px"></div>
 </div>
 
 <script type="text/javascript">
+    $(".form_datetime").datetimepicker({
+        format: "dd MM yyyy - hh:ii"
+    });
     // 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.getElementById('main'));
     var markPoint=[];
     var markPoint2=[];
     // 指定图表的配置项和数据
-
+    var categoryItem=[];
     var geoCoordMap = {
         "海门":[121.15,31.89],
         "鄂尔多斯":[109.781327,39.608266],
@@ -620,51 +636,117 @@
 function handleClick(params) {
     markPoint=myChart.getOption().series[2].markPoint.data;
     markPoint2=myChart.getOption().series[1].markPoint.data;
+    var dataItem=[];
+    categoryItem=[];
+
+    if(params.componentType!="markPoint"){
+        return
+    }
     for(var i=0;i<markPoint.length;i++){
         if(markPoint[i].yAxis==params.data.yAxis){
             if(markPoint[i].symbol=='image://img/starGray.png'){
                 markPoint2.push(markPoint[i]);
                 markPoint[i].symbol='image://img/starYellow.png';
+                for(var k=0;k<data.length;k++){
+                    for(var j=0;j<markPoint2.length;j++){
+                        if(data[k].name==markPoint2[j].yAxis){
+                            data.splice(k,1);
+                            k=k-1;
+                        }
+                    }
+                }
+                for(var m=0;m<data.length;m++){
+                    dataItem.push(data[m].value);
+                    categoryItem.push(data[m].name);
+                }
+                for(var n=0;n<markPoint2.length;n++){
+                    dataItem.push(markPoint2[n].value);
+                    categoryItem.push(markPoint2[n].yAxis);
+                }
             }else{
                 for(var j=0;j<markPoint.length;j++){
-                    if(markPoint[i].yAxis==params.data.yAxis){
-                        markPoint2.splice(j,1);
+                    if(markPoint[j].yAxis==params.data.yAxis){
+                        data.push(
+                                {
+                                    name: markPoint[j].yAxis,
+                                    value:markPoint[j].value
+                                }
+                        );
+                        data.sort(function (a, b) {
+                            return a.value - b.value;
+                        });
+                        for(var c=0;c<markPoint2.length;c++){
+                            if(markPoint2[c].yAxis==params.data.yAxis){
+                                markPoint2.splice(c,1);
+                            }
+                        }
+                        categoryItem=[];
+                        dataItem=[];
+                        for(var m=0;m<data.length;m++){
+                            categoryItem.push(data[m].name);
+                            dataItem.push(data[m].value);
+                        }
+                        for(var n=0;n<markPoint2.length;n++){
+                            categoryItem.push(markPoint2[n].yAxis);
+                            dataItem.push(markPoint2[n].value);
+                        }
                     }
                 }
                 markPoint[i].symbol='image://img/starGray.png';
             }
         }
     };
+/*
+    for(var j=0;j<data.length;j++){
+        for(var k=0;k<markPoint2.length;k++){
+            if(data[j].name==markPoint2[k].yAxis){
+                var templeObject= data[j];
+                data.splice(j,1);
+                data.unshift(templeObject);
+            }
+        }
+        for(var n=0;n<categoryData.length;n++){
+            if(data[j].name==categoryData[n]){
+                var templeObject=categoryData[n];
+                categoryData.splice(n,1);
+                categoryData.unshift(templeObject);
+            }
+        }
+    }*/
     var chartObject=new Object();
-    chartObject={
-        series: [{
-            id: 'bar',
-            markPoint:{
-                data:markPoint
-            }
-        },{
-            id: 'bar2',
-            markPoint:{
-                data:markPoint2
-            }
-        }]
-    };
+       chartObject={
+           yAxis: {
+               data: categoryItem
+           },
+           series: [{
+               id: 'bar',
+               data: dataItem,
+               markPoint:{
+                   data:markPoint
+                   }
+           },{
+               id: 'bar2',
+               markPoint:{
+                   data:markPoint2
+               }
+           }]
+       };
     myChart.setOption(chartObject);
-    console.log(myChart.getOption());
-    console.log(params);
-    console.log(this)
+    var params={
+        type:'datarangeselected',
+        selected:myChart.getOption().visualMap[0].range
+    };
+    renderBrushed(params)
 }
     function renderBrushed(params) {
         console.log(params);
         var selectedItems = [];
-        var categoryData = [];
         var barData = [];
         var barData2 = [];
-        var markPoint=[];
         var sum = 0;
         var count = 0;
         var chartObject=new Object();
-
+        var categoryData=[];
         if(params==null){
             for(var j=0;j<data.length;j++){
                 sum+=data[j].value;
@@ -675,7 +757,7 @@ function handleClick(params) {
                 return a.value - b.value;
             });
             for (var i = 0; i < selectedItems.length; i++) {
-                var markObject=new Object;
+                var markObject=new Object();
                 categoryData.push(selectedItems[i].name);
                 barData.push(selectedItems[i].value);
                 barData2.push(100);
@@ -688,10 +770,11 @@ function handleClick(params) {
             }
         } else if(params.type=='datarangeselected'){
             var templeData=[];
+            markPoint=[];
             for(var j=0;j<data.length;j++){
                 if(data[j].value>=params.selected[0]&&data[j].value<=params.selected[1]){
                     var templeObject=new Object();
-                    var markObject=new Object;
+                    var markObject=new Object();
                     templeObject.name=data[j].name;
                     templeObject.value=data[j].value;
                     templeData.push(templeObject);
@@ -702,10 +785,27 @@ function handleClick(params) {
                     markPoint.push(markObject);
                 }
             }
-            count=templeData.length;
             templeData.sort(function (a, b) {
                 return a.value - b.value;
             });
+            for(var m=0;m<markPoint2.length;m++){
+                templeData.push(
+                        {
+                            name:markPoint2[m].yAxis,
+                            value:markPoint2[m].value
+                        }
+                );
+                markPoint.push(
+                        {
+                            value:markPoint2[m].value,
+                            xAxis:100,
+                            yAxis:markPoint2[m].yAxis,
+                            symbol:'image://img/starYellow.png'
+                        }
+                )
+            }
+            count=templeData.length;
+
             for (var i = 0; i < templeData.length; i++) {
                 categoryData.push(templeData[i].name);
                 barData.push(templeData[i].value);
@@ -777,6 +877,9 @@ function handleClick(params) {
     // 使用刚指定的配置项和数据显示图表。
     myChart.setOption(option);
     renderBrushed();
+    Array.prototype.clone = function () {
+        return this.slice(0);
+    };
 </script>
 </body>
 </html>
