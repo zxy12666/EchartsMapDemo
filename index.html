@@ -33,7 +33,7 @@
 </head>
 <body>
 <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
-<div style="width:1400px;height: 900px;margin:0 auto;background-image: url(img/beijing.jpg);text-align: center" >
+<div style="width:1400px;height: 900px;margin:0 auto;background-image: url(img/beijing.png);text-align: center" >
         <div  style="margin-left: 70%;margin-bottom: -50px; width: 150px;height: 40px;background-color:#2c3343;border-radius:25px!important;padding-top: 10px;position:relative;z-index: 999">
             <button id="return" disabled style="background-image:url('img/return.png');background-color: #2c3343;background-repeat: no-repeat; width: 33px;height: 30px;border: 0px"></button>
             <div  class="input-append date" style="margin-left: 20px">
@@ -90,34 +90,77 @@
     $("#return").click(function(){
         $("#return").attr("disabled","disabled");
         $("#return").css("background-image","url(img/return.png)")
-        var chartObject=new Object();
-        chartObject={
-            geo: {
-                map: 'china',
-                zoom: 1,
-                label: {
-                    normal: {
-                        show: true
-                    },
-                    emphasis: {
-                        show: true
-                    }
+        lastData.geo={
+            map: 'china',
+            zoom: 1,
+            label: {
+                normal: {
+                    show: true
                 },
-                roam:false,
-                itemStyle: {
-                    normal: {
-                        areaColor : '#07C0F8',
-                        borderColor: '#111'
-                    },
-                    emphasis: {
-                        areaColor: '#086BAC'
-                    }
-                },
-                silent:false
-
+                emphasis: {
+                    show: true
+                }
             },
+            roam:false,
+            itemStyle: {
+                normal: {
+                    areaColor : '#43bff6',
+                    borderColor: '#1c88da',
+                    borderWidth:1,
+                    opacity:0.9
+                },
+                emphasis: {
+                    areaColor: '#086BAC'
+                }
+            },
+            silent:false
+
         };
-        myChart.setOption(chartObject);
+        for(var i=0;i<lastData.series.length;i++){
+            if(lastData.series[i].type=='scatter'){
+                lastData.series.splice(i,1);
+                break
+            }
+        }
+        lastData.series.push({
+            type: 'scatter',
+            coordinateSystem: 'geo',
+            data: convertedData[0],
+            symbolSize: 10,
+            label: {
+                normal: {
+                    formatter: '{b}',
+                    position: 'right',
+                    show: false
+                },
+                emphasis: {
+                    show: true
+                }
+            },
+            itemStyle: {
+                normal: {
+                    color: '#fff'
+                }
+            }
+        });
+        if(lastData.series[0].data.length<=10){
+            lastData.dataZoom=[
+                { // 第二个 dataZoom 组件
+                    show:false,
+                    start: 0,
+                    end: 100
+                }
+            ]
+        }else{
+            lastData.dataZoom=[
+                { // 第二个 dataZoom 组件
+                    show:true,
+                    start:  lastData.series[0].data.length/data.length*85,
+                    end: 100
+                }
+            ]
+        }
+        myChart.setOption(lastData);
     });
     // 基于准备好的dom，初始化echarts实例
     var myChart = echarts.init(document.getElementById('main'));
@@ -125,6 +168,8 @@
     var markPoint2=[];
     // 指定图表的配置项和数据
     var categoryItem=[];
+    var lastData=new Object();
+    var convertedData2=[]
     var geoCoordMap = {
         "海门":[121.15,31.89],
         "鄂尔多斯":[109.781327,39.608266],
@@ -202,7 +247,7 @@
         "平度":[119.97,36.77],
         "佛山":[113.11,23.05],
         "海口":[110.35,20.02],
-        "江门":[113.06,22.61],
+        "江门":[113.06,22.61]
     };
 
     var data = [
@@ -402,17 +447,25 @@
             zoom: 1,
             label: {
                 normal: {
-                    show: true
+                    show: true,
+                    textStyle:{
+                        color:"#fff"
+                    }
                 },
                 emphasis: {
-                    show: true
+                    show: true,
+                    textStyle:{
+                        color:"#fff"
+                    }
                 }
             },
             roam: false,
             itemStyle: {
                 normal: {
-                    areaColor : '#07C0F8',
-                    borderColor: '#111'
+                    areaColor : '#43bff6',
+                    borderColor: '#1c88da',
+                    borderWidth:1,
+                    opacity:0.9
                 },
                 emphasis: {
                     areaColor: '#086BAC'
@@ -483,7 +536,8 @@
                 type: 'scatter',
                 coordinateSystem: 'geo',
                 data: convertedData[0],
-                symbolSize: 10,
+                symbolSize: 15,
+                hoverAnimation:true,
                 label: {
                     normal: {
                         formatter: '{b}',
@@ -491,18 +545,28 @@
                         show: false
                     },
                     emphasis: {
-                        show: true
+                        show: true,
+                        textStyle:{
+                            fontSize:20
+                        }
+
                     }
                 },
                 itemStyle: {
                     normal: {
                         color: '#fff'
+                    },
+                    emphasis: {
+                        show: true,
+
                     }
                 }
             },
             {
                 id: 'bar2',
                 type: 'bar',
+                animationDurationUpdate:0,
+                animationEasingUpdate:"elasticInOut",
                 symbol: 'none',
                 itemStyle: {
                     normal: {
@@ -528,6 +592,8 @@
             {
                 id: 'bar',
                 zlevel: 99,
+                animationDurationUpdate:0,
+                animationEasingUpdate:"elasticInOut",
                 type: 'bar',
                 symbol: 'none',
                 itemStyle: {
@@ -547,6 +613,36 @@
                     data : []
                 },
                 data: []
+            },
+            {
+                type: 'scatter',
+                coordinateSystem: 'geo',
+                data:convertedData2,
+                symbolSize: 15,
+                hoverAnimation:true,
+                label: {
+                    normal: {
+                        formatter: '{b}',
+                        position: 'right',
+                        show: false
+                    },
+                    emphasis: {
+                        show: true,
+                        textStyle:{
+                            fontSize:20
+                        }
+
+                    }
+                },
+                itemStyle: {
+                    normal: {
+                        color: '#fff'
+                    },
+                    emphasis: {
+                        show: true,
+
+                    }
+                }
             }
         ]
     };
@@ -554,6 +650,22 @@
 
     myChart.on('datarangeselected', renderBrushed);
     myChart.on('click', handleClick);
+    myChart.on('mouseover', handleOver);
+    myChart.on('mouseout', handleOut);
+    function handleOver(params){
+        myChart.dispatchAction({
+            type: 'highlight',
+            seriesIndex:[0,1,2,3],
+            name:params.name
+        })
+    }
+    function handleOut(params){
+        myChart.dispatchAction({
+            type: 'downplay',
+            seriesIndex:[0,1,2,3],
+            name:params.name
+        })
+    }
     // myChart.setOption(option);
 /*    setTimeout(function () {
         myChart.dispatchAction({
@@ -567,56 +679,20 @@
             ]
         });series-scatter.geoIndex
     }, 0);*/
-    function mapselectchanged(params){
-        console.log(params);
-    }
 function handleClick(params) {
     markPoint=myChart.getOption().series[2].markPoint.data;
     markPoint2=myChart.getOption().series[1].markPoint.data;
     var dataItem=[];
     categoryItem=[];
+    var name=params.name;
 
     if(params.componentType=="geo"){
-        $("#return").removeAttr("disabled");
-        $("#return").css("background-image","url(img/returnWhite.png)");
-
-        var chartObject=new Object();
-        var scatterArray=convertedData[0];
-
-        chartObject={
-            geo: {
-                map: params.name,
-                layoutCenter: ['35%', '50%'],
-// 如果宽高比大于 1 则宽度为 100，如果小于 1 则高度为 100，保证了不超过 100x100 的区域
-                layoutSize: 800,
-                zoom: 0.9,
-                label: {
-                    normal: {
-                        show: true
-                    },
-                    emphasis: {
-                        show: true
-                    }
-                },
-                roam:false,
-                itemStyle: {
-                    normal: {
-                        areaColor : '#07C0F8',
-                        borderColor: '#111'
-                    },
-                    emphasis: {
-                        areaColor: '#086BAC'
-                    }
-                },
-                silent:true
-
-            }
-        };
-        myChart.setOption(chartObject);
+        handleClickGeo(params);
     }
     if(params.componentType!="markPoint"){
         return
     }
+    convertedData2=[];
     for(var i=0;i<markPoint.length;i++){
         if(markPoint[i].yAxis==params.data.yAxis){
             if(markPoint[i].symbol=='image://img/starGray.png'){
@@ -637,6 +713,11 @@ function handleClick(params) {
                 for(var n=0;n<markPoint2.length;n++){
                     dataItem.push(markPoint2[n].value);
                     categoryItem.push(markPoint2[n].yAxis);
+                    for(var c=0;c<convertedData[0].length;c++){
+                        if(markPoint2[n].yAxis==convertedData[0][c].name){
+                            convertedData2.push(convertedData[0][c]);
+                        }
+                    }
                 }
             }else{
                 for(var j=0;j<markPoint.length;j++){
@@ -644,7 +725,8 @@ function handleClick(params) {
                         data.push(
                                 {
                                     name: markPoint[j].yAxis,
-                                    value:markPoint[j].value
+                                    value:markPoint[j].value,
+                                    province:markPoint[j].province
                                 }
                         );
                         data.sort(function (a, b) {
@@ -664,6 +746,11 @@ function handleClick(params) {
                         for(var n=0;n<markPoint2.length;n++){
                             categoryItem.push(markPoint2[n].yAxis);
                             dataItem.push(markPoint2[n].value);
+                            for(var c=0;c<convertedData[0].length;c++){
+                                if(markPoint2[n].yAxis==convertedData[0][c].name){
+                                    convertedData2.push(convertedData[0][c]);
+                                }
+                            }
                         }
                     }
                 }
@@ -671,29 +758,19 @@ function handleClick(params) {
             }
         }
     };
-/*
-    for(var j=0;j<data.length;j++){
-        for(var k=0;k<markPoint2.length;k++){
-            if(data[j].name==markPoint2[k].yAxis){
-                var templeObject= data[j];
-                data.splice(j,1);
-                data.unshift(templeObject);
-            }
-        }
-        for(var n=0;n<categoryData.length;n++){
-            if(data[j].name==categoryData[n]){
-                var templeObject=categoryData[n];
-                categoryData.splice(n,1);
-                categoryData.unshift(templeObject);
-            }
-        }
-    }*/
     var chartObject=new Object();
+
        chartObject={
            yAxis: {
                data: categoryItem
            },
-           series: [{
+           series: [
+               {
+                   type: 'scatter',
+                   coordinateSystem: 'geo',
+                   data: convertedData[0]
+               },
+               {
                id: 'bar',
                data: dataItem,
                markPoint:{
@@ -704,17 +781,28 @@ function handleClick(params) {
                markPoint:{
                    data:markPoint2
                }
-           }]
+           }, {
+                   type: 'scatter',
+                   coordinateSystem: 'geo',
+                   data: convertedData2
+               },
+           ]
        };
     myChart.setOption(chartObject);
     var params={
         type:'datarangeselected',
         selected:myChart.getOption().visualMap[0].range
     };
-    renderBrushed(params)
+    renderBrushed(params);
+    if(myChart.getOption().geo[0].map!="china"){
+         var params={
+         name:myChart.getOption().geo[0].map,
+             componentType:"geo"
+         };
+         handleClick(params)
+     }
 }
     function renderBrushed(params) {
-        console.log(params);
         var selectedItems = [];
         var barData = [];
         var barData2 = [];
@@ -739,6 +827,7 @@ function handleClick(params) {
                 markObject.value=selectedItems[i].value;
                 markObject.xAxis=100;
                 markObject.yAxis=selectedItems[i].name;
+                markObject.province=selectedItems[i].province;
                 markObject.symbol='image://img/starGray.png';
                 markPoint.push(markObject);
 
@@ -754,6 +843,7 @@ function handleClick(params) {
                     templeObject.value=data[j].value;
                     templeData.push(templeObject);
                     markObject.value=data[j].value;
+                    markObject.province=data[j].province;
                     markObject.xAxis=100;
                     markObject.yAxis=data[j].name;
                     markObject.symbol='image://img/starGray.png';
@@ -773,6 +863,7 @@ function handleClick(params) {
                 markPoint.push(
                         {
                             value:markPoint2[m].value,
+                            province:markPoint2[m].province,
                             xAxis:100,
                             yAxis:markPoint2[m].yAxis,
                             symbol:'image://img/starYellow.png'
@@ -828,29 +919,32 @@ function handleClick(params) {
                 if(barData.length<=10){
                     chartObject.dataZoom=[
                         { // 第二个 dataZoom 组件
+                            show:false,
                             start: 0,
                             end: 100
-
                         }
                     ]
-                }else if(barData.length<=50){
+                }else {
                     chartObject.dataZoom=[
                         { // 第二个 dataZoom 组件
-                            start: 50,
-                            end: 100
-                        }
-                    ]
-                }else{
-                    chartObject.dataZoom=[
-                        { // 第二个 dataZoom 组件
-                            start: 85,
+                            show:true,
+                            start: barData.length/data.length*85,
                             end: 100
                         }
                     ]
                 }
             }
         }
+        console.log(barData.length/data.length*85);
+        lastData=chartObject;
         myChart.setOption(chartObject);
+        if(myChart.getOption().geo[0].map!="china"){
+            var params={
+                name:myChart.getOption().geo[0].map,
+                componentType:"geo"
+            };
+            handleClick(params)
+        }
     }
 
     // 使用刚指定的配置项和数据显示图表。
@@ -860,6 +954,112 @@ function handleClick(params) {
         return this.slice(0);
     };
 
+    function handleClickGeo(params){
+        var dataItem=[];
+        $("#return").removeAttr("disabled");
+        $("#return").css("background-image","url(img/returnWhite.png)");
+
+        var chartObject=new Object();
+        var scatterArray=convertedData[0];
+        var markpointT1=[];
+        var markpointT2=[];
+        var barData=[];
+        var barData2=[];
+        for(var i=0;i<markPoint.length;i++){
+            if(markPoint[i].province==params.name){
+                markpointT1.push(markPoint[i]);
+                barData.push(markPoint[i].value);
+                barData2.push(100);
+                categoryItem.push(markPoint[i].yAxis)
+            }
+        };
+        for(var j=0;j<markPoint2.length;j++){
+            if(markPoint2[j].province==params.name){
+                markpointT2.push(markPoint2[j]);
+            }
+        }
+        for(var k=0;k<convertedData[0].length;k++){
+            if($.inArray(convertedData[0][k].name,categoryItem)!=-1){
+                dataItem.push(convertedData[0][k])
+            }
+        }
+        chartObject={
+            title:[
+                {
+                    id: 'statistic',
+                    text: params.name+'主要监测项目'
+                }
+            ],
+            yAxis: {
+                data: categoryItem
+            },
+            geo: {
+                map: params.name,
+                layoutCenter: ['35%', '50%'],
+// 如果宽高比大于 1 则宽度为 100，如果小于 1 则高度为 100，保证了不超过 100x100 的区域
+                layoutSize: 800,
+                zoom: 0.9,
+                label: {
+                    normal: {
+                        show: true
+                    },
+                    emphasis: {
+                        show: true
+                    }
+                },
+                roam:false,
+                itemStyle: {
+                    normal: {
+                        areaColor : '#43bff6',
+                        borderColor: '#1c88da',
+                        borderWidth:1,
+                        opacity:0.9
+                    },
+                    emphasis: {
+                        areaColor: '#086BAC'
+                    }
+                },
+                silent:true
+            },
+            series: [
+                {
+                    type: 'scatter',
+                    coordinateSystem: 'geo',
+                    data: dataItem
+                },
+                {
+                    id: 'bar',
+                    data: barData,
+                    markPoint:{
+                        data:markpointT1
+                    }
+                },{
+                    id: 'bar2',
+                    data: barData2,
+                    markPoint:{
+                        data:markpointT2
+                    }
+                }]
+        };
+        if(barData.length<=10){
+            chartObject.dataZoom=[
+                { // 第二个 dataZoom 组件
+                    show:false,
+                    start: 0,
+                    end: 100
+                }
+            ]
+        }else{
+            chartObject.dataZoom=[
+                { // 第二个 dataZoom 组件
+                    show:true,
+                    start: barData.length/data.length*85,
+                    end: 100
+                }
+            ]
+        }
+        myChart.setOption(chartObject);
+    }
 </script>
 </body>
 </html>
