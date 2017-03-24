@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <head>
+        <meta charset="utf-8">
+        <title>ECharts</title>
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/bootstrap-select.css">
+        <link rel="stylesheet" href="css/unionboostrap.css">
+        <link rel="stylesheet" href="css/chosen.css">
+        <link rel="stylesheet" href="css/commonSupport.css">
+        <link rel="stylesheet" href="css/bootstrap-responsive.min.css">
+        <link rel="stylesheet" href="css/metro.css">
+        <link rel="stylesheet" href="css/jquery.gritter.css">
+        <link rel="stylesheet" href="css/font-awesome.css">
+        <link rel="stylesheet" href="css/font-awesome.min.css">
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/style_responsive.css">
+        <link rel="stylesheet" href="css/TopMenu.css">
+        <link rel="stylesheet" href="css/windowbox.css">
+
+        <script src="js/jquery-1.8.3.min.js"></script>
+        <script src="js/bootstrap-select.js"></script>
+        <script src="js/bootstrap-dropdown.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <!-- 引入 echarts.js -->
+        <script src="js/echarts.js"></script>
+    </head>
+</head>
+<body>
+    <div id="bar" style="width:300px;height:100px;margin: 100px"></div>
+    <script type="text/javascript">
+        var myChart = echarts.init(document.getElementById('bar'));
+        var option ={
+            backgroundColor: '#ddd',
+            tooltip : {
+                trigger: 'axis',
+                formatter: function (params, ticket, callback) {
+                    var str="时间"+params[0].data[0];
+                    if(params[0].data[1]==0){
+                        return str+"下线"
+                    }else{
+                        return str+"上线"
+                    }
+                },
+                axisPointer: {
+                    type:'none'
+                }
+            },
+            grid: {
+                left: '0%',
+                right: '0%',
+                bottom: '0%',
+                top:"0%"
+            },
+            xAxis : [
+                {
+                    type : 'time',
+                    show : false,
+                    min:'2015-04-20 00:00:00',
+                    max:'2015-04-21 00:00:00'
+                }
+
+            ],
+            yAxis : [
+                {
+                    type : 'value',
+                    show : false
+                }
+            ],
+            series : [
+                {
+                    name:'视频广告',
+                    type:'line',
+                    symbol:"none",
+                    stack: '总量',
+                    step: "end",
+                    lineStyle: {normal: {
+                        color:"#2193EC"
+                    }},
+                    areaStyle: {normal: {
+                        color:"#2193EC"
+                    }},
+                    data:[["2015-04-20 07:36:27.890",0],["2015-04-20 07:37:35.627",1],["2015-04-20 08:37:35.627",0],["2015-04-20 09:37:35.627",1]]
+                }
+            ]
+        };
+        myChart.setOption(option);
+
+    </script>
+</body>
+</html>
