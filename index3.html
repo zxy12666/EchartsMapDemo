@@ -3,9 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <head>
-        <meta charset="utf-8">
-        <title>ECharts</title>
         <link rel="stylesheet" href="css/bootstrap.min.css">
         <link rel="stylesheet" href="css/bootstrap-select.css">
         <link rel="stylesheet" href="css/unionboostrap.css">
@@ -20,6 +17,7 @@
         <link rel="stylesheet" href="css/style_responsive.css">
         <link rel="stylesheet" href="css/TopMenu.css">
         <link rel="stylesheet" href="css/windowbox.css">
+        <link rel="stylesheet" href="css/jquery.dataTables.min.css">
 
         <script src="js/jquery-1.8.3.min.js"></script>
         <script src="js/bootstrap-select.js"></script>
@@ -27,67 +25,410 @@
         <script src="js/bootstrap.min.js"></script>
         <!-- 引入 echarts.js -->
         <script src="js/echarts.js"></script>
-    </head>
+        <script src="js/jquery.dataTables.min.js"></script>
+    <style>
+        .dataTables_info{
+            color: #666!important;
+        }
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current, .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover{
+            background:linear-gradient(to bottom, #ccc 0%, #383F52 100%)
+        }
+        select{
+            width:130px;
+            background-color: #9c9c9c;
+        }
+    </style>
 </head>
 <body>
-    <div id="bar" style="width:300px;height:100px;margin: 100px"></div>
+
+    <div style="width: 1100px;text-align: center;margin: 20px auto;background-image: url(img/beijing.png)" class="box">
+        <div style="width: 1050px;margin: 0 auto">
+            <a id="return" disabled style="background-image:url('img/returnWhite.png');background-repeat: no-repeat; width: 33px;height: 30px;border: 0px;display: inline-block;float: left;margin-top: 20px" href="index.html"></a>
+            <h3 id="title" style="display: inline-block;color: #ddd">数据详情页</h3>
+            <div style="float: right;margin-top: 25px">
+                <img src="img/dataTime.png" style="display: inline-block;margin-left: 50px;margin-bottom: 5px">
+                <p style="color: #ffffff;display: inline-block;margin-left: 10px" id="timeSelect"></p>
+            </div>
+        </div>
+        <div >
+            <div id="Themeintegrityrate" style="width: 800px;height: 250px;display: inline-block;"></div>
+            <div id="warningStatistics" style="width: 250px;height: 250px;display: inline-block"></div>
+        </div>
+        <div id="dtuStatistics" style="width: 1050px;margin: 20px auto;background-color: #383F52">
+            <table id="dtuTable" class="row-border" style="color: gray;">
+                <thead style="background-color: #383F52">
+                <tr>
+                    <th style="width: 12%">DTU编号</th>
+                    <th style="width: 10%">状态</th>
+                    <th style="width: 10%">在线时长</th>
+                    <th style="width: 10%">离线时长</th>
+                    <th style="width: 10%">在线率</th>
+                    <th style="width: 10%">掉线次数</th>
+                    <th style="width: 22%">掉线图表</th>
+                    <th style="width: 16%">传感器异常个数/总数</th>
+                    <th>null</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+        <div id="sensorStatistics" style="width: 1050px;margin: 20px auto;background-color: #383F52">
+            <table id="senTable" class="row-border" style="color: gray;">
+                <thead style="background-color: #383F52">
+                <tr>
+                    <th style="width: 12%">传感器监测主题类别:
+                        <select id="ThemeSelect"></select>
+                    </th>
+                    <th style="width: 10%">传感器测点名称</th>
+                    <th style="width: 10%">采集完整率</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
     <script type="text/javascript">
-        var myChart = echarts.init(document.getElementById('bar'));
-        var option ={
-            backgroundColor: '#ddd',
-            tooltip : {
-                trigger: 'axis',
-                formatter: function (params, ticket, callback) {
-                    var str="时间"+params[0].data[0];
-                    if(params[0].data[1]==0){
-                        return str+"下线"
-                    }else{
-                        return str+"上线"
+        //对date格式的数据进行格式化
+        Date.prototype.Format = function (fmt) { //author: meizz
+            var o = {
+                "M+": this.getMonth() + 1, //月份
+                "d+": this.getDate(), //日
+                "h+": this.getHours(), //小时
+                "m+": this.getMinutes(), //分
+                "s+": this.getSeconds(), //秒
+                "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+                "S": this.getMilliseconds() //毫秒
+            };
+            if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            for (var k in o)
+                if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            return fmt;
+        };
+        var jsonData;
+        var myChartWarning = echarts.init(document.getElementById('warningStatistics'));
+        var myChartTheme = echarts.init(document.getElementById('Themeintegrityrate'));
+        getTime();
+        var urlSearch=window.location.search;
+        var structName=decodeURI(urlSearch.split("?id=")[1]);
+        if(structName!="undefined"){
+            $("#title").html(structName+"数据详情");
+        }
+        $.getJSON("js/data.json",null,function(data){
+            jsonData=data;
+            console.log(data);
+            var themeintegrityrateData=jsonData.Themeintegrityrate[0].integrityrateData;
+            var warningData=jsonData.warningData[0].warningStatistics;
+            ThemeStatic(themeintegrityrateData);
+            warningStatistics(warningData);
+            drawDtuTable(jsonData.dtuStatus);
+            drawBar();
+            if(jsonData.sensorData.length==0){return}
+            for(var i=0;i<jsonData.sensorData.length;i++){
+                $("#ThemeSelect").append("<option id="+jsonData.sensorData[i].ThemeId+">"+ jsonData.sensorData[i].ThemeName+"</option>")
+            }
+            drawSensorTable(jsonData.sensorData);
+            $("#ThemeSelect").change(function(){
+                var table = $('#myTable').DataTable();
+                table.destroy();
+                drawSensorTable(jsonData.sensorData);
+                document.getElementById('senTable').scrollIntoView()
+            })
+        });
+
+        function ThemeStatic(themeintegrityrateData){
+            var ThemeCr=[];
+            var ThemeSer=[];
+            for(var i=0;i<themeintegrityrateData.length;i++){
+                ThemeCr.push(themeintegrityrateData[i].ThemeNmae);
+                ThemeSer.push(
+                        {
+                            name: themeintegrityrateData[i].ThemeNmae,
+                            value:themeintegrityrateData[i].integrityrate*100,
+                            ThemeId:themeintegrityrateData[i].ThemeId
+                        }
+                )
+            }
+            var  ThemeChart= {
+                color: ['#3398DB'],
+                tooltip : {
+                    formatter:function (params) {
+                            return params.name+":"+"<br />采集完整率："+params.value+"%";
                     }
                 },
-                axisPointer: {
-                    type:'none'
-                }
-            },
-            grid: {
-                left: '0%',
-                right: '0%',
-                bottom: '0%',
-                top:"0%"
-            },
-            xAxis : [
-                {
-                    type : 'time',
-                    show : false,
-                    min:'2015-04-20 00:00:00',
-                    max:'2015-04-21 00:00:00'
-                }
+                backgroundColor: '#2c3343',//背景色
+                title:{
+                    text:"数据完整性(百分比)",
+                    left: 300,
+                    textStyle:{
+                        color:'gray'
+                    }
+                },
+                textStyle:{
+                    color:'gray'
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis : [
+                    {
+                        type : 'category',
+                        data : ThemeCr,
+                        axisLine:{
+                            lineStyle:{
+                                color:'#fff'
+                            }
+                        }
+                    }
+                ],
+                yAxis :
+                    {
+                        type : 'value',
+                        min:0,
+                        max:100,
+                        axisLabel:{
+                            formatter: '{value}%'
+                        }
+                    },
+                series : [
+                    {
+                        name:'采集完整率',
+                        type:'bar',
+                        barWidth: '60%',
+                        data:ThemeSer
+                    }
+                ]
+            };
+            myChartTheme.setOption(ThemeChart);
+        }
 
-            ],
-            yAxis : [
-                {
-                    type : 'value',
-                    show : false
+        function warningStatistics(warningData){
+
+            var serData=[];
+            for(var i=0;i<warningData.length;i++){
+                serData.push({
+                    name:warningData[i].Content,
+                    value:warningData[i].Count
+                })
+            }
+            var warningChart = {
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b}: {c} ({d}%)"
+                },
+                title:{
+                  text:"采集异常分类统计",
+                    textStyle:{
+                        color:'gray'
+                    }
+                },
+                backgroundColor: '#2c3343',//背景色
+                series: [
+                    {
+                        name:'异常统计',
+                        type:'pie',
+                        radius: ['50%', '70%'],
+                        avoidLabelOverlap: false,
+                        data:serData,
+                        label:{
+                          normal:{
+                              position:'inside'
+                          }
+                        },
+                    }
+                ]
+            };
+            myChartWarning.setOption(warningChart);
+
+        }
+
+        myChartTheme.on('click', function (params) {
+            var thtmeId=params.data.ThemeId;
+            for(var i=0;i<jsonData.warningData.length;i++){
+                if(thtmeId==jsonData.warningData[i].ThemeId){
+                    warningStatistics(jsonData.warningData[i].warningStatistics)
                 }
-            ],
-            series : [
-                {
-                    name:'视频广告',
-                    type:'line',
-                    symbol:"none",
-                    stack: '总量',
-                    step: "end",
-                    lineStyle: {normal: {
-                        color:"#2193EC"
-                    }},
-                    areaStyle: {normal: {
-                        color:"#2193EC"
-                    }},
-                    data:[["2015-04-20 07:36:27.890",0],["2015-04-20 07:37:35.627",1],["2015-04-20 08:37:35.627",0],["2015-04-20 09:37:35.627",1]]
+            }
+        });
+
+        function drawDtuTable(data){
+            $("#dtuTable").dataTable(
+                    {
+                        data:data,
+                        dom: '<"top">rt<"bottom"ip><"clear">',
+                        language: {
+                            'emptyTable': '没有数据',
+                            'loadingRecords': '加载中...',
+                            'processing': '查询中...',
+                            'search': '搜索:',
+                            'lengthMenu': '每页 _MENU_ 条记录',
+                            'zeroRecords': '没有数据',
+                            'paginate': {
+                                'next':       '上一页',
+                                'previous':   '下一页'
+                            },
+                            'info': '第 _PAGE_ 页 / 共 _PAGES_ 页',
+                            'infoEmpty': '没有数据',
+                            'infoFiltered': '(从 _MAX_ 条记录中筛选)'
+                        },
+                        columns: [
+                            { data: 'DtuId' ,"bSortable": false},
+                            { data: 'LastStatus' ,render :function(data,row,type,meta){
+                                if(data==1){
+                                    return "在线"
+                                }else{
+                                    return "离线"
+                                }
+                            }},
+                            { data: 'OnlineTime' },
+                            { data: 'OfflineTime' },
+                            { data:'OnlineRate',render :function(data,row,type,meta){return data+"%"}},
+                            { data: 'DropCount' },
+                            { data:null,render:function(data,row,type,meta){
+                                return "<div id=bar"+data.DtuId+" style='width: 100%;height: 30px '></div>"
+                            }},
+                            { data:"WarningSensorCount"},
+                            { data:"SensorCount"},
+                        ],
+                        aaSorting: [[ 0, "esc" ]],
+                        columnDefs: [
+                            {
+                                "orderable":false,
+                                "targets":[1,6,7]
+                            },
+                            {
+                            "render": function(data, type, row) {
+                                return data + '/' + row.SensorCount ;
+                            },
+                            "targets": 7,
+
+                        },
+                            {
+                                "visible": false,
+                                "targets": [8]
+                            },
+
+                        ]
+                    }
+            )
+        }
+
+        function drawBar(){
+            for(var i=0;i<$("div[id^=bar]").length;i++){
+                var dtuId=$("div[id^=bar]")[i].id.split("bar")[1];
+                for(var j=0;j<jsonData.dtuStatus.length;j++){
+                    if(dtuId==jsonData.dtuStatus[j].DtuId){
+                        var myChartBar = echarts.init($("#bar"+ dtuId )[0]);
+                        var dataArray=[];
+                        for(var k=0;k<jsonData.dtuStatus[j].dtuStatus.length;k++){
+                            var templeArray=[];
+                            templeArray.push(jsonData.dtuStatus[j].dtuStatus[k].Time);
+                            templeArray.push(jsonData.dtuStatus[j].dtuStatus[k].Status);
+                            dataArray.push(templeArray);
+                        }
+                        var barOption ={
+                            backgroundColor: '#505664',
+                            tooltip : {
+                                trigger: 'axis',
+                                formatter: function (params, ticket, callback) {
+                                    var str="时间"+params[0].data[0];
+                                    if(params[0].data[1]==0){
+                                        return str+"下线"
+                                    }else{
+                                        return str+"上线"
+                                    }
+                                },
+                                axisPointer: {
+                                    type:'none'
+                                }
+                            },
+                            grid: {
+                                left: '0%',
+                                right: '0%',
+                                bottom: '0%',
+                                top:"0%"
+                            },
+                            xAxis : [
+                                {
+                                    type : 'time',
+                                    show : false
+                                }
+
+                            ],
+                            yAxis : [
+                                {
+                                    type : 'value',
+                                    show : false,
+                                   min:0.1
+                                }
+                            ],
+                            series : [
+                                {
+                                    name:'视频广告',
+                                    type:'line',
+                                    symbol:"none",
+                                    stack: '总量',
+                                    step: "end",
+                                    lineStyle: {normal: {
+                                        color:"#3398DB",
+                                        opacity:1
+                                    }},
+                                    areaStyle: {normal: {
+                                        color:"#3398DB"
+                                    }},
+                                    data:dataArray
+                                }
+                            ]
+                        };
+                        myChartBar.setOption(barOption);
+                    }
                 }
-            ]
-        };
-        myChart.setOption(option);
+            }
+        }
+
+        function drawSensorTable(data){
+            var selectId= $("#ThemeSelect option:selected")[0].id;
+            for(var j=0;j<data.length;j++){
+                if(selectId==data[j].ThemeId){
+                    $("#senTable").dataTable(
+                            {
+                                data:data[j].sensorArray,
+                                destroy: true,
+                                dom: '<"top">rt<"bottom"ip><"clear">',
+                                language: {
+                                    'emptyTable': '没有数据',
+                                    'loadingRecords': '加载中...',
+                                    'processing': '查询中...',
+                                    'search': '搜索:',
+                                    'lengthMenu': '每页 _MENU_ 条记录',
+                                    'zeroRecords': '没有数据',
+                                    'paginate': {
+                                        'next':       '上一页',
+                                        'previous':   '下一页'
+                                    },
+                                    'info': '第 _PAGE_ 页 / 共 _PAGES_ 页',
+                                    'infoEmpty': '没有数据',
+                                    'infoFiltered': '(从 _MAX_ 条记录中筛选)'
+                                },
+                                columns: [
+                                    { data: "ThemeName" ,"bSortable": false},
+                                    { data:"SensorName","bSortable": false},
+                                    { data:"Integrityrate",render :function(data,row,type,meta){return data+"%"}},
+                                ],
+                                aaSorting: [[ 0, "esc" ]]
+                            }
+                    );
+                    return
+                }
+            }
+        }
+
+        function getTime() {
+            var nowDate=new Date();
+            var time1 = new Date(new Date(nowDate.Format("yyyy-MM-dd").replace(/-/,"/")).getTime()).Format("yyyy-MM-dd hh:mm:ss");
+            var time2 = new Date().Format("yyyy-MM-dd hh:mm:ss");
+            $("#timeSelect").html(time1+"-"+time2);
+        }
 
     </script>
 </body>

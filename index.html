@@ -689,8 +689,12 @@ function handleClick(params) {
     if(params.componentType=="geo"){
         handleClickGeo(params);
     }
-    if(params.componentType!="markPoint"){
-        return
+    if(params.componentType=="series"||params.componentType=="bar"){
+        window.location.href="index3.html?id="+encodeURI(params.name);
+    }else{
+        if(params.componentType!="markPoint"){
+            return
+        }
     }
     convertedData2=[];
     for(var i=0;i<markPoint.length;i++){

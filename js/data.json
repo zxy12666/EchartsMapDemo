@@ -1,1 +1,521 @@
-
+{
+  "Themeintegrityrate":[
+    {
+      "StructId": 12,
+      "integrityrateData": [
+        {
+          "ThemeId": 1,
+          "ThemeNmae":"环境主题",
+          "integrityrate": 0.6,
+          "SubscribeTime": "\"2017-03-08 05:30:00\""
+        },
+        {
+          "ThemeId": 2,
+          "ThemeNmae":"变形主题",
+          "integrityrate": 0.8,
+          "SubscribeTime": "\"2017-03-08 05:30:00\""
+        },
+        {
+          "ThemeId": 3,
+          "ThemeNmae":"应变主题",
+          "integrityrate": 0.9,
+          "SubscribeTime": "\"2017-03-08 05:30:00\""
+        },
+        {
+          "ThemeId": 4,
+          "ThemeNmae":"受力主题",
+          "integrityrate": 0.75,
+          "SubscribeTime": "\"2017-03-08 05:30:00\""
+        },
+        {
+          "ThemeId": 128,
+          "ThemeNmae":"特种设备主题",
+          "integrityrate": 0.2,
+          "SubscribeTime": "\"2017-03-08 05:30:00\""
+        }
+      ]
+    }
+  ],
+  "warningData":[
+    {
+      "StructId": 12,
+      "ThemeId": 1,
+      "Time": "\"2017-03-08 05:30:00\"",
+      "warningStatistics": [
+        {
+          "WarningType": 3007,
+          "Content": "数据超阈值",
+          "Count": 20
+        },
+        {
+          "WarningType": 3001,
+          "Content": "设备诊断异常",
+          "Count": 10
+        },
+        {
+          "WarningType": 3003,
+          "Content": "采集超时",
+          "Count": 15
+        },
+        {
+          "WarningType": 2001,
+          "Content": "DTU下线",
+          "Count": 10
+        }
+      ]
+    },
+    {
+      "StructId": 12,
+      "ThemeId": 2,
+      "Time": "\"2017-03-08 05:30:00\"",
+      "warningStatistics": [
+        {
+          "WarningType": 3007,
+          "Content": "数据超阈值",
+          "Count": 9
+        },
+        {
+          "WarningType": 3001,
+          "Content": "设备诊断异常",
+          "Count": 20
+        },
+        {
+          "WarningType": 3003,
+          "Content": "采集超时",
+          "Count": 35
+        },
+        {
+          "WarningType": 2001,
+          "Content": "DTU下线",
+          "Count": 40
+        }
+      ]
+    },
+    {
+      "StructId": 12,
+      "ThemeId": 3,
+      "Time": "\"2017-03-08 05:30:00\"",
+      "warningStatistics": [
+        {
+          "WarningType": 3007,
+          "Content": "数据超阈值",
+          "Count": 10
+        },
+        {
+          "WarningType": 3001,
+          "Content": "设备诊断异常",
+          "Count": 50
+        },
+        {
+          "WarningType": 3003,
+          "Content": "采集超时",
+          "Count": 24
+        },
+        {
+          "WarningType": 2001,
+          "Content": "DTU下线",
+          "Count": 43
+        }
+      ]
+    },
+    {
+      "StructId": 12,
+      "ThemeId": 4,
+      "Time": "\"2017-03-08 05:30:00\"",
+      "warningStatistics": [
+        {
+          "WarningType": 3007,
+          "Content": "数据超阈值",
+          "Count": 18
+        },
+        {
+          "WarningType": 3001,
+          "Content": "设备诊断异常",
+          "Count": 30
+        },
+        {
+          "WarningType": 3003,
+          "Content": "采集超时",
+          "Count": 40
+        },
+        {
+          "WarningType": 2001,
+          "Content": "DTU下线",
+          "Count": 50
+        }
+      ]
+    },
+    {
+      "StructId": 12,
+      "ThemeId": 128,
+      "Time": "\"2017-03-08 05:30:00\"",
+      "warningStatistics": [
+        {
+          "WarningType": 3007,
+          "Content": "数据超阈值",
+          "Count": 18
+        },
+        {
+          "WarningType": 3001,
+          "Content": "设备诊断异常",
+          "Count": 25
+        },
+        {
+          "WarningType": 3003,
+          "Content": "采集超时",
+          "Count": 122
+        },
+        {
+          "WarningType": 2001,
+          "Content": "DTU下线",
+          "Count": 45
+        }
+      ]
+    }
+  ],
+  "dtuStatus":[
+    {
+      "DtuId": 133,
+      "LastStatus": 1,
+      "OnlineTime": 25.82,
+      "OfflineTime": 0.18,
+      "OnlineRate": 99,
+      "DropCount": 2,
+      "WarningSensorCount": 0,
+      "SensorCount": 10,
+      "dtuStatus": [
+        {
+          "Status": 1,
+          "Time": "2016-04-17 00:00:00"
+        },
+        {
+          "Status": 1,
+          "Time": "2016-04-17 05:00:00"
+        },
+        {
+          "Status": 0,
+          "Time": "2016-04-17 12:00:00"
+        },
+        {
+          "Status": 1,
+          "Time": "2016-04-17 18:00:00"
+        },
+        {
+          "Status": 1,
+          "Time": "2016-04-18 00:00:00"
+        }
+      ]
+    },
+    {
+      "DtuId": 145,
+      "LastStatus": 0,
+      "OnlineTime": 21.82,
+      "OfflineTime": 0.18,
+      "OnlineRate": 99,
+      "DropCount": 4,
+      "WarningSensorCount": 2,
+      "SensorCount": 18,
+      "dtuStatus": [
+        {
+          "Status": 0,
+          "Time": "2016-04-17 00:00:00"
+        },
+        {
+          "Status": 1,
+          "Time": "2016-04-17 07:00:00"
+        },
+        {
+          "Status": 0,
+          "Time": "2016-04-17 14:00:00"
+        },
+        {
+          "Status": 1,
+          "Time": "2016-04-17 20:00:00"
+        },
+        {
+          "Status": 0,
+          "Time": "2016-04-18 00:00:00"
+        }
+      ]
+    },
+    {
+      "DtuId": 166,
+      "LastStatus": 0,
+      "OnlineTime": 21.82,
+      "OfflineTime": 0.18,
+      "OnlineRate": 99,
+      "DropCount": 4,
+      "WarningSensorCount": 2,
+      "SensorCount": 18,
+      "dtuStatus": [
+        {
+          "Status": 0,
+          "Time": "2016-04-17 00:00:00"
+        },
+        {
+          "Status": 1,
+          "Time": "2016-04-17 07:00:00"
+        },
+        {
+          "Status": 0,
+          "Time": "2016-04-17 14:00:00"
+        },
+        {
+          "Status": 1,
+          "Time": "2016-04-17 20:00:00"
+        },
+        {
+          "Status": 0,
+          "Time": "2016-04-18 00:00:00"
+        }
+      ]
+    },{
+      "DtuId": 188,
+      "LastStatus": 0,
+      "OnlineTime": 21.82,
+      "OfflineTime": 0.18,
+      "OnlineRate": 99,
+      "DropCount": 4,
+      "WarningSensorCount": 2,
+      "SensorCount": 18,
+      "dtuStatus": [
+        {
+          "Status": 0,
+          "Time": "2016-04-17 00:00:00"
+        },
+        {
+          "Status": 1,
+          "Time": "2016-04-17 07:00:00"
+        },
+        {
+          "Status": 0,
+          "Time": "2016-04-17 14:00:00"
+        },
+        {
+          "Status": 1,
+          "Time": "2016-04-17 20:00:00"
+        },
+        {
+          "Status": 0,
+          "Time": "2016-04-18 00:00:00"
+        }
+      ]
+    },
+    {
+      "DtuId": 200,
+      "LastStatus": 0,
+      "OnlineTime": 21.82,
+      "OfflineTime": 0.18,
+      "OnlineRate": 99,
+      "DropCount": 4,
+      "WarningSensorCount": 2,
+      "SensorCount": 18,
+      "dtuStatus": [
+        {
+          "Status": 0,
+          "Time": "2016-04-17 00:00:00"
+        },
+        {
+          "Status": 1,
+          "Time": "2016-04-17 07:00:00"
+        },
+        {
+          "Status": 0,
+          "Time": "2016-04-17 14:00:00"
+        },
+        {
+          "Status": 1,
+          "Time": "2016-04-17 20:00:00"
+        },
+        {
+          "Status": 0,
+          "Time": "2016-04-18 00:00:00"
+        }
+      ]
+    }
+  ],
+  "sensorData":[
+    {
+      "StructId": 133,
+      "ThemeId": 1,
+      "ThemeName":"环境主题",
+      "sensorArray": [
+        {
+          "SensorId": 141,
+          "SensorName": "14标边坡大里程方向-下",
+          "Integrityrate": 99,
+          "ThemeName":"环境主题",
+          "Time": "2017-03-29 05:30:00"
+        },
+        {
+          "SensorId": 142,
+          "SensorName": "14标边坡大里程方向-中",
+          "Integrityrate": 99,
+          "ThemeName":"环境主题",
+          "Time": "2017-03-29 05:30:00"
+        },
+        {
+          "SensorId": 143,
+          "SensorName": "14标边坡大里程方向-上",
+          "Integrityrate": 93,
+          "ThemeName":"环境主题",
+          "Time": "2017-03-29 05:30:00"
+        },
+        {
+          "SensorId": 145,
+          "SensorName": "14标边坡小里程方向-中",
+          "Integrityrate": 90,
+          "ThemeName":"环境主题",
+          "Time": "2017-03-29 05:30:00"
+        },
+        {
+          "SensorId": 148,
+          "SensorName": "14标边坡大里程第二个管道最下面",
+          "Integrityrate": 89,
+          "ThemeName":"环境主题",
+          "Time": "2017-03-29 05:30:00"
+        }
+      ]
+    },
+    {
+      "StructId": 133,
+      "ThemeId": 2,
+      "ThemeName":"变形主题",
+      "sensorArray": [
+        {
+          "SensorId": 161,
+          "SensorName": "BM1",
+          "Integrityrate": 61,
+          "ThemeName":"变形主题",
+          "Time": "2017-03-29 05:30:00"
+        },
+        {
+          "SensorId": 162,
+          "SensorName": "BM2",
+          "Integrityrate": 62,
+          "ThemeName":"变形主题",
+          "Time": "2017-03-29 05:30:00"
+        },
+        {
+          "SensorId": 163,
+          "SensorName": "BM3",
+          "Integrityrate": 64,
+          "ThemeName":"变形主题",
+          "Time": "2017-03-29 05:30:00"
+        },
+        {
+          "SensorId": 164,
+          "SensorName": "BM4",
+          "Integrityrate": 65,
+          "ThemeName":"变形主题",
+          "Time": "2017-03-29 05:30:00"
+        },
+        {
+          "SensorId": 165,
+          "SensorName": "BM5",
+          "Integrityrate": 66,
+          "ThemeName":"变形主题",
+          "Time": "2017-03-29 05:30:00"
+        }
+      ]
+    },
+    {
+      "StructId": 133,
+      "ThemeId": 3,
+      "ThemeName":"应变主题",
+      "sensorArray": [
+        {
+          "SensorId": 464,
+          "SensorName": "悬索桥中塔上游",
+          "Integrityrate": 99,
+          "ThemeName":"应变主题",
+          "Time": "2017-03-29 05:30:00"
+        },
+        {
+          "SensorId": 465,
+          "SensorName": "悬索桥中塔下游",
+          "Integrityrate": 99,
+          "ThemeName":"应变主题",
+          "Time": "2017-03-29 05:30:00"
+        }
+      ]
+    },
+    {
+      "StructId": 133,
+      "ThemeId": 4,
+      "ThemeName":"受力主题",
+      "sensorArray": [
+        {
+          "SensorId": 728,
+          "SensorName": "LTG-1",
+          "Integrityrate": 99,
+          "ThemeName":"受力主题",
+          "Time": "2017-03-29 05:30:00"
+        },
+        {
+          "SensorId": 729,
+          "SensorName": "LTG-2",
+          "Integrityrate": 99,
+          "ThemeName":"受力主题",
+          "Time": "2017-03-29 05:30:00"
+        },
+        {
+          "SensorId": 730,
+          "SensorName": "LTG-3",
+          "Integrityrate": 93,
+          "ThemeName":"受力主题",
+          "Time": "2017-03-29 05:30:00"
+        },
+        {
+          "SensorId": 731,
+          "SensorName": "LTG-4",
+          "Integrityrate": 90,
+          "ThemeName":"受力主题",
+          "Time": "2017-03-29 05:30:00"
+        },
+        {
+          "SensorId": 732,
+          "SensorName": "LTG-5",
+          "Integrityrate": 89,
+          "ThemeName":"受力主题",
+          "Time": "2017-03-29 05:30:00"
+        }
+      ]
+    },
+    {
+      "StructId": 133,
+      "ThemeId": 128,
+      "ThemeName":"特种设备主题",
+      "sensorArray": [
+        {
+          "SensorId": 804,
+          "SensorName": "WSBM2-1",
+          "Integrityrate": 99,
+          "ThemeName":"特种设备主题",
+          "Time": "2017-03-29 05:30:00"
+        },
+        {
+          "SensorId": 805,
+          "SensorName": "WSBM2-2",
+          "Integrityrate": 99,
+          "ThemeName":"特种设备主题",
+          "Time": "2017-03-29 05:30:00"
+        },
+        {
+          "SensorId": 806,
+          "SensorName": "WSBM2-3",
+          "Integrityrate": 93,
+          "ThemeName":"特种设备主题",
+          "Time": "2017-03-29 05:30:00"
+        },
+        {
+          "SensorId": 807,
+          "SensorName": "WSBM2-4",
+          "Integrityrate": 90,
+          "ThemeName":"特种设备主题",
+          "Time": "2017-03-29 05:30:00"
+        }
+      ]
+    }
+  ]
+}
